@@ -192,15 +192,16 @@ fprintf('in Simulink \n')
 
 %% Section 2.1: Brake System Modeling
 % Question 2.1.1
-TbrakeMax = FbrakeMax*r     %Max Braking Torque [N-m]
-pBrakeMax = 4*TbrakeMax / (mu_k*pi()* cylinderBore^2 *meanPadRadius*numPads)
+TbrakeMax = FbrakeMax*r;     %Max Braking Torque [N-m]
+pBrakeMax = 4*TbrakeMax / (mu_k*pi()* cylinderBore^2 *meanPadRadius*numPads);
 
 % Question 2.1.3
 omega = 100;
-Pdissipate = TbrakeMax * omega * k_W2kW
+Pdissipate = TbrakeMax * omega * k_W2kW;
 
 % Plot Drivecyle US06
-cycleNum = 2;   tEnd = tEndUS06;
+cycleNum = 2;   
+tEnd = tEndUS06;
 sec21Results = sim(BEV_SIMULATION_NAME);
 figure();   hold on
 sec21Results.driver.velocitySetpoint.plot
@@ -219,15 +220,17 @@ title('US06 Fuel Economy');   xlabel('Time [s]'); ylabel('MPGe [mpg]')
 batteryCapacity = 50;       %[kWh]
 
 % Question 2.2.1
-GRequired = 25*k_gal2kWh
+GRequired = 25*k_gal2kWh;
 
 % Question 2.2.5
-GRgen = 1.4
+GRgen = 1.4;
 
 
 %% Section 2.3: Series Hyrbrid Model
 SOCi = 90;  tEnd = tEndUS06 * 5;
-sec23Results = sim(HEV_SIMULATION_NAME);    
+fprintf("Running the Hybrid Electric Model on US06 Drivecycle\n")
+sec23Results = sim(HEV_SIMULATION_NAME);
+fprintf("Finished!\n")
 results = sec23Results;
 
 % Question 2.3.1: plot drivecylce and actual velocity
@@ -264,7 +267,9 @@ title('Cyclical US06 Fuel Economy - MPGe')
 GRgen = 1.3;
 torqueCommand = 65;     %[Nm]
 motorSpeedCommand = 800;%[rpm]
+fprintf("Running the DC Motor Genset model with setpoints 65 Nm at 800 RPM\n");
 sec31Results = sim(DC_GENSET_SIMULATION_NAME);  results = sec31Results;
+fprintf("Finished!\n");
 
 % Question 3.1.1
 figure; hold on
@@ -288,8 +293,9 @@ title('DC Motor Genset Power Losses')
 
 %% Section 3.2: DC Motor Genset Implementation Into Series Hybrid
 tEnd = tEndUS06*5;  cycleNum = 2;   GRgen = 1.4;
+fprintf("Running DC Motor Genset in Series Hybrid simulation on US06 Drivecycle\n")
 sec32Results = sim(GRADUATE_SIMULATION_NAME);  results = sec32Results;
-
+fprintf("Finished!\n")
 % Question 3.2.1: plot drivecylce and actual velocity
 figure();   hold on
 results.driver.velocitySetpoint.plot
@@ -322,6 +328,7 @@ title('Cyclical US06 Fuel Economy - MPGe')
 SOCdata = 0:10:100;
 openCircuitVoltageData = [320 350 380 393 397 400 404 407 410 418 420];
 tEnd = 3613;
+fprintf("Running Higher Fidelity Battery Pack model on US06 Drivecycle\n")
 sec33Results = sim(GRADUATE_SIMULATION_NAME_2);     results = sec33Results;
 
 figure;
