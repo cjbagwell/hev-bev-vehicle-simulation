@@ -7,7 +7,7 @@
 %% Prepare Workspace 
 close all;  clear;  clc;
 
-% Import Data
+% Set file variables
 BEV_SIMULATION_NAME = 'BEVModel';
 HEV_SIMULATION_NAME = 'HEVModel';
 DC_GENSET_SIMULATION_NAME = 'DCMotorGenset';
@@ -130,7 +130,8 @@ k_kWh2J = 3.6*10^6;         %[J/kWh]
 
 
 %% Section 1: Vehicle Concept Questions (Based on BEV Model)
-fprintf('Section 1: Vehicle Concept Questions /n')
+clc;
+fprintf('Section 1: Vehicle Concept Questions\n\n')
 
 % Question 1.4
 Pout = 457;
@@ -138,7 +139,14 @@ etaEngine = 0.35;
 Pin = Pout / etaEngine;
 Ploss = Pin - Pout;
 percentQ = 0.5;
-radiatiorRaditing = Ploss*percentQ
+radiatiorRaditing = Ploss * percentQ;
+out = append('Question 1.4:',...
+    '\tWhen designing a thermal system to control the temperature in an internal\n',...
+    '\tcombustion engine, what should theapproximate rating of the radiator be if\n',...
+    '\tthe engine is expected to produce 457 hp at the crankshaft?\n', ...
+    '\n',...
+    '\tThe approximate power rating of the radiator is %.0f hp.\n\n');
+fprintf(out, radiatiorRaditing);
 
 % Question 1.5
 Pw = motorMaxPower * 0.99;
@@ -147,18 +155,33 @@ bPly = 0;
 c = Crr*m*g;
 d= -Pw;
 polyCoeff = [a bPly c d];
-vMax = roots(polyCoeff)*k_mps2mph
+vMax = roots(polyCoeff)*k_mps2mph;
+out = append('Question 1.5:',...
+    '\tCalculate the drag limited top speed of the vehicle assuming there are no \n',...
+    '\tlimits on component speeds.\n\n',...
+    '\tThe limited top speed is %.0f mph\n\n');
+fprintf(out, vMax(3));
 
 % Question 1.6
 v = 105 * k_kph2mps;
 deltaT = 3 * k_hr2s;
-Edrag = (1/2*rho*Af*Cd*v^2 + Crr*m*g*cos(theta)) * v*deltaT
+Edrag = (1/2*rho*Af*Cd*v^2 + Crr*m*g*cos(theta)) * v*deltaT /1000;
+out = append('Question 1.6:',...
+    '\tHow much energy is consumed from drag forces when the vehicle travels at 105 kph\n',...
+    '\tfor 3 hours in kJ?\n\n',...
+    '\tThe energy comsumed from drag forces is approximately %.0f kj.\n\n');
+fprintf(out, round(Edrag, -3));
 
 % Question 1.7
 Ftr = 1/2*rho*Cd*Af*v^2 + Crr*m*g*cos(theta);
-APP7 = 100*(Ftr*r)/(motorMaxTorque * 0.965)
+APP7 = 100*(Ftr*r)/(motorMaxTorque * 0.965);
 deltaX = v*k_mps2mph*3;
-MPGe = deltaX*.965*.93/(Edrag*k_J2kWh*k_kWh2gal)
+MPGe = deltaX*.965*.93/(Edrag*k_J2kWh*k_kWh2gal) / 1000;
+out = append('Question 1.7:',...
+    '\tWhat is the APP value at a steady state of 105 kph? What is the equivalent fuel\n',...
+    'economy in MPGe, assuming 93%% efficiency for battery pack losses?\n\n',...
+    '\tThe APP is approximately %.1f%% and the fuel economy equivelent is %.0f.\n\n');
+fprintf(out, APP7, MPGe);
 
 
 %% Section 2: Vehicle Modeling 
