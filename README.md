@@ -10,3 +10,7 @@ as well as a five drivecycles repeated cyclically.  The code can easily be exten
 to the 'Drivecycles' block.
 
 ## Results
+![alt text](https://github.com/cjbagwell/hev-bev-vehicle-simulation/blob/master/images/Battery_Electric_Vehicle_US06_Simulation.jpg)
+![alt text](https://github.com/cjbagwell/hev-bev-vehicle-simulation/blob/master/images/Hybrid_Electric_Vehicle_US06_Simulation.jpg)
+![alt text](https://github.com/cjbagwell/hev-bev-vehicle-simulation/blob/master/images/Battery_Electric_Vehicle_Cyclical_US06_Simulation.jpg)
+![alt text](https://github.com/cjbagwell/hev-bev-vehicle-simulation/blob/master/images/Hybrid_Electric_Vehicle_Cyclical_US06_Simulation.jpg)
