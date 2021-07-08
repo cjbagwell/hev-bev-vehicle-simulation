@@ -201,7 +201,7 @@ Pdissipate = TbrakeMax * omega * k_W2kW;
 
 % Plot Drivecyle US06
 cycleNum = 2;   
-SOCi = 90
+SOCi = 90;
 tEnd = tEndUS06;
 fprintf("Running Battery Electric Vehicle Simulation on US06 Drivecycle... ")
 sec21Results = sim(BEV_SIMULATION_NAME);
@@ -228,7 +228,7 @@ title('SOC');       xlabel('Time [s]'); ylabel('SOC [%]')
 % Plot Cyclical Drivecyle US06
 cycleNum = 2;   
 tEnd = tEndUS06 * 5;
-SOCi = 90
+SOCi = 90;
 fprintf("Running Battery Electric Vehicle Simulation on US06 Drivecycle... ")
 cycBevResults = sim(BEV_SIMULATION_NAME);
 fprintf("Finished!\n")
@@ -242,7 +242,7 @@ legend('Setpiont','Actual')
 
 % Plot MPGe
 hold off
-subplot(1, 2, 2)
+subplot(2, 2, 2)
 cycBevResults.battery.MPGe.plot
 title('Fuel Economy');   xlabel('Time [s]'); ylabel('MPGe [mpg]')
 
@@ -263,81 +263,91 @@ GRequired = 25*k_gal2kWh;
 GRgen = 1.4;
 
 
-%% Section 2.3: Series Hyrbrid Model
+%% Series Hyrbrid Model US06 Simulation
 SOCi = 90;  tEnd = tEndUS06;
 fprintf("Running the Hybrid Electric Model on US06 Drivecycle... ")
 sec23Results = sim(HEV_SIMULATION_NAME);
 fprintf("Finished!\n")
 results = sec23Results;
 
-% Question 2.3.1: plot drivecylce and actual velocity
+% plot results
 figure();
 sgtitle("Hybrid Electric US06 Simulation")
-subplot(2, 3, 1); hold on;
+
+% Velocity
+subplot(2, 2, 1); hold on;
 results.driver.velocitySetpoint.plot
 results.vehicleDynamics.velocity.plot
 legend('Velocity Setpoint [m/s]','Actual Velocity [m/s]')
 title('Velocity')
-% Question 2.3.2: Plot SOC
-subplot(2, 3, 2);
+
+% Fuel Economy
+subplot(2, 2, 2);
+results.battery.MPGe.plot
+ylabel('MPG-e')
+title('Fuel Economy')
+
+% SOC
+subplot(2, 2, 3);
 results.battery.SOC.plot
 ylabel('%')
 title('SOC')
-% Question 2.3.3: Plot fuel left in gas tank
-subplot(2, 3, 3);
-results.genset.engine.gasTankVolume.plot
-title('Fuel Volume')
-ylabel('gal')
-% Question 2.3.4: Plot actual Engine Torque and Actual Motor Speed
-subplot(2, 3, 4);     hold on
+
+% Genset Data
+subplot(2, 2, 4);     hold on
 results.genset.engine.brakeTorque.plot
 results.genset.motor.rpm.plot
-legend('Engine Brake Torque [Nm]','Motor Angular Velocity [rpm]')
+yyaxis right
+ylabel('Volume [gal]')
+p = results.genset.engine.gasTankVolume.plot;
+p.Color = 'black';
+ax = gca;
+ax.YAxis(2).Color = 'k';
+legend('Engine Brake Torque [Nm]','Motor Angular Velocity [rpm]', 'Fuel Volume [gal]')
 title('Genset Data')
-% Question 2.3.5: Plot MPGe
-subplot(2, 3, 5);
-results.battery.MPGe.plot
-ylabel('mpg')
-title('Fuel Economy - MPGe')
-% Question 2.3.6
 
-
-% Run Cyclical Drivecycle Simulation
+%% Run Cyclical Drivecycle Simulation
 SOCi = 90;  tEnd = tEndUS06 * 5;
-fprintf("Running the Hybrid Electric Model on US06 Drivecycle... ")
+fprintf("Running the Hybrid Electric Model on Cyclical US06 Drivecycle... ")
 sec23Results = sim(HEV_SIMULATION_NAME);
 fprintf("Finished!\n")
 results = sec23Results;
 
-% Question 2.3.1: plot drivecylce and actual velocity
+% plot results
 figure();
-sgtitle("Hybrid Electric Cyclical US06 Simulation")
-subplot(2, 3, 1); hold on;
+sgtitle("Hybrid Electric US06 Simulation")
+
+% Velocity
+subplot(2, 2, 1); hold on;
 results.driver.velocitySetpoint.plot
 results.vehicleDynamics.velocity.plot
-legend('Setpoint','Actual')
+legend('Velocity Setpoint [m/s]','Actual Velocity [m/s]')
 title('Velocity')
-% Question 2.3.2: Plot SOC
-subplot(2, 3, 2);
+
+% Fuel Economy
+subplot(2, 2, 2);
+results.battery.MPGe.plot
+ylabel('MPG-e')
+title('Fuel Economy')
+
+% SOC
+subplot(2, 2, 3);
 results.battery.SOC.plot
 ylabel('%')
 title('SOC')
-% Question 2.3.3: Plot fuel left in gas tank
-subplot(2, 3, 3);
-results.genset.engine.gasTankVolume.plot
-title('Fuel Volume')
-ylabel('gal')
-% Question 2.3.4: Plot actual Engine Torque and Actual Motor Speed
-subplot(2, 3, 4);     hold on
+
+% Genset Data
+subplot(2, 2, 4);     hold on
 results.genset.engine.brakeTorque.plot
 results.genset.motor.rpm.plot
-legend('Engine Brake Torque [Nm]','Motor Angular Velocity [rpm]')
+yyaxis right
+ylabel('Volume [gal]')
+p = results.genset.engine.gasTankVolume.plot;
+p.Color = 'black';
+ax = gca;
+ax.YAxis(2).Color = 'k';
+legend('Engine Brake Torque [Nm]','Motor Angular Velocity [rpm]', 'Fuel Volume [gal]')
 title('Genset Data')
-% Question 2.3.5: Plot MPGe
-subplot(2, 3, 5);
-results.battery.MPGe.plot
-ylabel('mpg')
-title('Fuel Economy - MPGe')
 
 %% Section 3.1: Open-Loop DC Motor Genset
 GRgen = 1.3;
