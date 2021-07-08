@@ -205,14 +205,17 @@ tEnd = tEndUS06;
 fprintf("Running Battery Electric Vehicle Simulation on US06 Drivecycle... ")
 sec21Results = sim(BEV_SIMULATION_NAME);
 fprintf("Finished!\n")
-figure();   hold on
+figure();   
+subplot(1, 2, 1); hold on;
+sgtitle("Battery Electric Vehicle US06 Simulation")
 sec21Results.driver.velocitySetpoint.plot
 sec21Results.vehicleDynamics.velocity.plot
 title('US06 Drivecycle');   xlabel('Time [s]'); ylabel('Velocity [m/s]')
 legend('Velocity Setpiont','Velocity Actual')
 
 % Plot MPGe
-figure();   hold off
+hold off
+subplot(1, 2, 2)
 sec21Results.battery.MPGe.plot
 title('US06 Fuel Economy');   xlabel('Time [s]'); ylabel('MPGe [mpg]')
 
@@ -236,29 +239,31 @@ fprintf("Finished!\n")
 results = sec23Results;
 
 % Question 2.3.1: plot drivecylce and actual velocity
-figure();   hold on
+figure();
+sgtitle("Hybrid Electric US06 Simulation")
+subplot(2, 3, 1); hold on;
 results.driver.velocitySetpoint.plot
 results.vehicleDynamics.velocity.plot
 legend('Velocity Setpoint [m/s]','Actual Velocity [m/s]')
 title('Cyclical US06 Drivecycle Velocity')
 % Question 2.3.2: Plot SOC
-figure;
+subplot(2, 3, 2);
 results.battery.SOC.plot
 ylabel('%')
 title('Cyclical US06 SOC')
 % Question 2.3.3: Plot fuel left in gas tank
-figure;
+subplot(2, 3, 3);
 results.genset.engine.gasTankVolume.plot
 title('Cyclical US06 Genset Fuel Volume')
 ylabel('gal')
 % Question 2.3.4: Plot actual Engine Torque and Actual Motor Speed
-figure;     hold on
+subplot(2, 3, 4);     hold on
 results.genset.engine.brakeTorque.plot
 results.genset.motor.rpm.plot
 legend('Engine Brake Torque [Nm]','Motor Angular Velocity [rpm]')
 title('Cyclical US06 Genset Data')
 % Question 2.3.5: Plot MPGe
-figure;
+subplot(2, 3, 5);
 results.battery.MPGe.plot
 ylabel('mpg')
 title('Cyclical US06 Fuel Economy - MPGe')
