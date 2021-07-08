@@ -128,226 +128,67 @@ k_m32gal = 264.172;         %[gal/m^3]
 k_gal2kWh = 32.3;           %[kWh/gal]
 k_kWh2J = 3.6*10^6;         %[J/kWh]
 
-
-%% Section 1: Vehicle Concept Questions (Based on BEV Model)
-clc;
-fprintf('Section 1: Vehicle Concept Questions\n\n')
-
-% Question 1.4
-Pout = 457;
-etaEngine = 0.35;
-Pin = Pout / etaEngine;
-Ploss = Pin - Pout;
-percentQ = 0.5;
-radiatiorRaditing = Ploss * percentQ;
-out = append('Question 1.4:',...
-    '\tWhen designing a thermal system to control the temperature in an internal\n',...
-    '\tcombustion engine, what should theapproximate rating of the radiator be if\n',...
-    '\tthe engine is expected to produce 457 hp at the crankshaft?\n', ...
-    '\n',...
-    '\tThe approximate power rating of the radiator is %.0f hp.\n\n');
-fprintf(out, radiatiorRaditing);
-
-% Question 1.5
-Pw = motorMaxPower * 0.99;
-a = 1/2*rho*Af*Cd;
-bPly = 0;
-c = Crr*m*g;
-d= -Pw;
-polyCoeff = [a bPly c d];
-vMax = roots(polyCoeff)*k_mps2mph;
-out = append('Question 1.5:',...
-    '\tCalculate the drag limited top speed of the vehicle assuming there are no \n',...
-    '\tlimits on component speeds.\n\n',...
-    '\tThe limited top speed is %.0f mph\n\n');
-fprintf(out, vMax(3));
-
-% Question 1.6
-v = 105 * k_kph2mps;
-deltaT = 3 * k_hr2s;
-Edrag = (1/2*rho*Af*Cd*v^2 + Crr*m*g*cos(theta)) * v*deltaT /1000;
-out = append('Question 1.6:',...
-    '\tHow much energy is consumed from drag forces when the vehicle travels at 105 kph\n',...
-    '\tfor 3 hours in kJ?\n\n',...
-    '\tThe energy comsumed from drag forces is approximately %.0f kj.\n\n');
-fprintf(out, round(Edrag, -3));
-
-% Question 1.7
-Ftr = 1/2*rho*Cd*Af*v^2 + Crr*m*g*cos(theta);
-APP7 = 100*(Ftr*r)/(motorMaxTorque * 0.965);
-deltaX = v*k_mps2mph*3;
-MPGe = deltaX*.965*.93/(Edrag*k_J2kWh*k_kWh2gal) / 1000;
-out = append('Question 1.7:',...
-    '\tWhat is the APP value at a steady state of 105 kph? What is the equivalent fuel\n',...
-    'economy in MPGe, assuming 93%% efficiency for battery pack losses?\n\n',...
-    '\tThe APP is approximately %.1f%% and the fuel economy equivelent is %.0f.\n\n');
-fprintf(out, APP7, MPGe);
-
-
-%% Section 2: Vehicle Modeling 
-fprintf('Section 2: Vehicle Modeling \n')
-fprintf('In this section, simulations are run on vehicle models created ')
-fprintf('in Simulink \n')
-
-
-%% Section 2.1: Brake System Modeling
-% Question 2.1.1
+%% BEV Model Simulation on US06
+% Prepare simulation variables
 TbrakeMax = FbrakeMax*r;     %Max Braking Torque [N-m]
 pBrakeMax = 4*TbrakeMax / (mu_k*pi()* cylinderBore^2 *meanPadRadius*numPads);
-
-% Question 2.1.3
 omega = 100;
 Pdissipate = TbrakeMax * omega * k_W2kW;
-
-% Plot Drivecyle US06
 cycleNum = 2;   
 SOCi = 90;
 tEnd = tEndUS06;
+
+% Run Simulation
 fprintf("Running Battery Electric Vehicle Simulation on US06 Drivecycle... ")
 sec21Results = sim(BEV_SIMULATION_NAME);
 fprintf("Finished!\n")
-figure();   
-subplot(2, 2, 1); hold on;
-sgtitle("Battery Electric Vehicle US06 Simulation")
-sec21Results.driver.velocitySetpoint.plot
-sec21Results.vehicleDynamics.velocity.plot
-title('Velocity');   xlabel('Time [s]'); ylabel('Velocity [m/s]')
-legend('Setpoint','Actual')
+plotBasicResults(sec21Results, "Battery Electric Vehicle US06 Simulation", false);
 
-% Plot MPGe
-hold off
-subplot(2, 2, 2)
-sec21Results.battery.MPGe.plot
-title('Fuel Economy');   xlabel('Time [s]'); ylabel('MPGe [mpg]')
-
-% Plot SOC
-subplot(2, 2, 3)
-sec21Results.battery.SOC.plot
-title('SOC');       xlabel('Time [s]'); ylabel('SOC [%]')
-
-% Plot Cyclical Drivecyle US06
+%% BEV Model Simulation on Cyclical US06 
+% Prepare simulation variables
+TbrakeMax = FbrakeMax*r;     %Max Braking Torque [N-m]
+pBrakeMax = 4*TbrakeMax / (mu_k*pi()* cylinderBore^2 *meanPadRadius*numPads);
+omega = 100;
+Pdissipate = TbrakeMax * omega * k_W2kW;
 cycleNum = 2;   
-tEnd = tEndUS06 * 5;
 SOCi = 90;
+tEnd = tEndUS06 * 5;
+
+% Run Simulation
 fprintf("Running Battery Electric Vehicle Simulation on US06 Drivecycle... ")
 cycBevResults = sim(BEV_SIMULATION_NAME);
 fprintf("Finished!\n")
-figure();   
-subplot(2, 2, 1); hold on;
-sgtitle("Battery Electric Vehicle Cyclical US06 Simulation")
-cycBevResults.driver.velocitySetpoint.plot
-cycBevResults.vehicleDynamics.velocity.plot
-title('Velocity');   xlabel('Time [s]'); ylabel('Velocity [m/s]')
-legend('Setpiont','Actual')
-
-% Plot MPGe
-hold off
-subplot(2, 2, 2)
-cycBevResults.battery.MPGe.plot
-title('Fuel Economy');   xlabel('Time [s]'); ylabel('MPGe [mpg]')
-
-% Plot SOC
-subplot(2, 2, 3)
-cycBevResults.battery.SOC.plot
-title('SOC');       xlabel('Time [s]'); ylabel('SOC [%]')
-
-
-%% Section 2.2: Modeling a Generator Set
-% implement new hybrid configuration
-batteryCapacity = 50;       %[kWh]
-
-% Question 2.2.1
-GRequired = 25*k_gal2kWh;
-
-% Question 2.2.5
-GRgen = 1.4;
+plotBasicResults(cycBevResults, "Battery Electric Vehicle Cyclical US06 Simulation", false);
 
 
 %% Series Hyrbrid Model US06 Simulation
-SOCi = 90;  tEnd = tEndUS06;
+% Prepare simulation variables
+batteryCapacity = 50;       %[kWh]
+GRequired = 25*k_gal2kWh;
+GRgen = 1.4;
+SOCi = 90;  
+tEnd = tEndUS06;
+
+% Run Simulation
 fprintf("Running the Hybrid Electric Model on US06 Drivecycle... ")
 sec23Results = sim(HEV_SIMULATION_NAME);
 fprintf("Finished!\n")
-results = sec23Results;
-
-% plot results
-figure();
-sgtitle("Hybrid Electric US06 Simulation")
-
-% Velocity
-subplot(2, 2, 1); hold on;
-results.driver.velocitySetpoint.plot
-results.vehicleDynamics.velocity.plot
-legend('Velocity Setpoint [m/s]','Actual Velocity [m/s]')
-title('Velocity')
-
-% Fuel Economy
-subplot(2, 2, 2);
-results.battery.MPGe.plot
-ylabel('MPG-e')
-title('Fuel Economy')
-
-% SOC
-subplot(2, 2, 3);
-results.battery.SOC.plot
-ylabel('%')
-title('SOC')
-
-% Genset Data
-subplot(2, 2, 4);     hold on
-results.genset.engine.brakeTorque.plot
-results.genset.motor.rpm.plot
-yyaxis right
-ylabel('Volume [gal]')
-p = results.genset.engine.gasTankVolume.plot;
-p.Color = 'black';
-ax = gca;
-ax.YAxis(2).Color = 'k';
-legend('Engine Brake Torque [Nm]','Motor Angular Velocity [rpm]', 'Fuel Volume [gal]')
-title('Genset Data')
+plotBasicResults(sec23Results, "Hybrid Electric Vehicle US06 Simulation", true);
 
 %% Run Cyclical Drivecycle Simulation
-SOCi = 90;  tEnd = tEndUS06 * 5;
+% Prepare simulation variables
+batteryCapacity = 50;       %[kWh]
+GRequired = 25*k_gal2kWh;
+GRgen = 1.4;
+SOCi = 90;  
+tEnd = tEndUS06 * 5;
+
+% Run Simulation
 fprintf("Running the Hybrid Electric Model on Cyclical US06 Drivecycle... ")
 sec23Results = sim(HEV_SIMULATION_NAME);
 fprintf("Finished!\n")
-results = sec23Results;
+plotBasicResults(sec23Results, "Hybrid Electric Vehicle Cyclical US06 Simulation", true);
 
-% plot results
-figure();
-sgtitle("Hybrid Electric US06 Simulation")
-
-% Velocity
-subplot(2, 2, 1); hold on;
-results.driver.velocitySetpoint.plot
-results.vehicleDynamics.velocity.plot
-legend('Velocity Setpoint [m/s]','Actual Velocity [m/s]')
-title('Velocity')
-
-% Fuel Economy
-subplot(2, 2, 2);
-results.battery.MPGe.plot
-ylabel('MPG-e')
-title('Fuel Economy')
-
-% SOC
-subplot(2, 2, 3);
-results.battery.SOC.plot
-ylabel('%')
-title('SOC')
-
-% Genset Data
-subplot(2, 2, 4);     hold on
-results.genset.engine.brakeTorque.plot
-results.genset.motor.rpm.plot
-yyaxis right
-ylabel('Volume [gal]')
-p = results.genset.engine.gasTankVolume.plot;
-p.Color = 'black';
-ax = gca;
-ax.YAxis(2).Color = 'k';
-legend('Engine Brake Torque [Nm]','Motor Angular Velocity [rpm]', 'Fuel Volume [gal]')
-title('Genset Data')
 
 %% Section 3.1: Open-Loop DC Motor Genset
 GRgen = 1.3;
@@ -450,6 +291,45 @@ function MPGe = getMpg(results)
     MPGe = positionFinal/energyUsed;
 end
 
+function fig = plotBasicResults(results, name, plotGenset)
+    figure();
+    fig = gca;
+    sgtitle(name)
+
+    % Velocity
+    subplot(2, 2, 1); hold on;
+    results.driver.velocitySetpoint.plot
+    results.vehicleDynamics.velocity.plot
+    legend('Setpoint [m/s]','Actual [m/s]')
+    title('Velocity')
+
+    % Fuel Economy
+    subplot(2, 2, 2);
+    results.battery.MPGe.plot
+    ylabel('MPG-e')
+    title('Fuel Economy')
+
+    % SOC
+    subplot(2, 2, 3);
+    results.battery.SOC.plot
+    ylabel('%')
+    title('SOC')
+
+    % Genset Data
+    if plotGenset
+        subplot(2, 2, 4);     hold on
+        results.genset.engine.brakeTorque.plot
+        results.genset.motor.rpm.plot
+        yyaxis right
+        ylabel('Volume [gal]')
+        p = results.genset.engine.gasTankVolume.plot;
+        p.Color = 'black';
+        ax = gca;
+        ax.YAxis(2).Color = 'k';
+        legend('Engine Brake Torque [Nm]','Motor Angular Velocity [rpm]', 'Fuel Volume [gal]')
+        title('Genset Data')
+    end
+end
 function [cycleTime, t60] = getCycleTime(results)
 k_mph2mps = 0.4470; time = results.tout;    sampleNum = 1;
 velocity = results.vehicleDynamics.velocity.data;
