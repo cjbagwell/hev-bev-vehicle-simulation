@@ -192,30 +192,35 @@ plotBasicResults(sec23Results, "Hybrid Electric Vehicle Cyclical US06 Simulation
 
 %% Section 3.1: Open-Loop DC Motor Genset
 GRgen = 1.3;
+tEnd = 10;
 torqueCommand = 65;     %[Nm]
 motorSpeedCommand = 800;%[rpm]
 fprintf("Running the DC Motor Genset model with setpoints 65 Nm at 800 RPM... ");
 sec31Results = sim(DC_GENSET_SIMULATION_NAME);  results = sec31Results;
 fprintf("Finished!\n");
 
-% Question 3.1.1
-figure; hold on
+%Plot Results
+figure; 
+sgtitle("DC Genset Open-Loop Test")
+
+% Power
+subplot(1, 2, 1)
+hold on
 results.genset.engine.powerIn.plot
 results.genset.motor.idealPower.plot
 xlabel('Time [s]'); ylabel('Power [kW]')
-legend('Engine Input Power','Ideal Electrical Power')
-title('DC Motor Genset Powers')
-% Question 3.1.2
-figure; hold on
+legend('Fuel Power','Ideal Electrical Power')
+title('Power')
+
+% Power Loss
+subplot(1, 2, 2)
+hold on
 results.genset.gearbox.powerLoss.plot
 results.genset.motor.dampingPowerLoss.plot
 results.genset.motor.resistancePowerLoss.plot
 xlabel('Time [s]'); ylabel('Power [kW]')
 legend('Gearbox Power Loss','Damping Power Loss','Resistance Power Loss')
 title('DC Motor Genset Power Losses')
-% Question 3.1.3
-
-% Question 3.1.4
 
 
 %% Section 3.2: DC Motor Genset Implementation Into Series Hybrid
