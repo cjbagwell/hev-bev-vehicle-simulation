@@ -63,9 +63,9 @@ GRgen = 1.3;                %Genset Gearbox Gear Ratio
 initialGasVolume = 5;       %Initial Volume of Gasoline in Tank [gal]
 
 % Grad Portion Parameters
-KP_DC = 200;
+KP_DC = 5;
 KI_DC = 0.1;
-KD_DC = 0;
+KD_DC = 0.02;
 
 % Brake Parameters
 meanPadRadius = .20;        %Mean Pad Radius of Brakes [m]
